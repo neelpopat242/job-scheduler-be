@@ -1,0 +1,70 @@
+{
+	"info": {
+		"name": "Job Queue - Client API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:5000"
+		},
+		{
+			"key": "job_id",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"url": "{{base_url}}/health"
+			}
+		},
+		{
+			"name": "Submit Job",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.jobId) {",
+							"    pm.collectionVariables.set('job_id', jsonData.jobId);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Process Invoice\",\n    \"description\": \"Process invoice #12345\",\n    \"metadata\": {\n        \"invoiceId\": \"12345\",\n        \"amount\": 150.00\n    }\n}"
+				},
+				"url": "{{base_url}}/jobs"
+			}
+		},
+		{
+			"name": "Get Job Status",
+			"request": {
+				"method": "GET",
+				"url": "{{base_url}}/jobs/{{job_id}}/status"
+			}
+		},
+		{
+			"name": "Get Jobs Metadata",
+			"request": {
+				"method": "GET",
+				"url": "{{base_url}}/jobs/metadata"
+			}
+		}
+	]
+}
